@@ -13,7 +13,6 @@ def create_app(config_name='default'):
     
     db.init_app(app)
     login_manager.init_app(app)
-    print(f"DEBUG: login_manager callback is {login_manager.user_callback}")
     migrate.init_app(app, db)
     limiter.init_app(app)
     
