@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftInvoice – Professional Invoicing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="{{ url_for('main.dashboard') }}" class="sidebar-brand">
+                Swift<span class="text-primary">Invoice</span>
+            </a>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="{{ url_for('main.dashboard') }}"
+                        class="sidebar-nav-link {{ 'active' if request.path == url_for('main.dashboard') }}">
+                        <i class="bi bi-grid-fill"></i> Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ url_for('invoices.index') }}"
+                        class="sidebar-nav-link {{ 'active' if request.path == url_for('invoices.index') }}">
+                        <i class="bi bi-receipt"></i> Invoices
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ url_for('clients.index') }}"
+                        class="sidebar-nav-link {{ 'active' if request.path == url_for('clients.index') }}">
+                        <i class="bi bi-people-fill"></i> Clients
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ url_for('main.reports') }}"
+                        class="sidebar-nav-link {{ 'active' if request.path == url_for('main.reports') }}">
+                        <i class="bi bi-bar-chart-fill"></i> Reports
+                    </a>
+                </li>
+
+                <!-- Subscription Section -->
+                <li class="sidebar-nav-item mt-3 px-3">
+                    <div class="text-white small mb-2">
+                        Plan: <strong>{{ current_user.organization.plan_id|upper }}</strong>
+                    </div>
+                    {% if current_user.organization.plan_id == 'free' %}
+                    <a href="{{ url_for('settings.upgrade_page') }}" class="btn btn-sm btn-warning w-100 text-dark fw-bold"
+                        style="font-size: 0.75rem;">
+                        Upgrade to Pro
+                    </a>
+                    {% endif %}
+                </li>
+
+                <li class="sidebar-nav-item mt-4">
+                    <a href="{{ url_for('settings.settings_page') }}"
+                        class="sidebar-nav-link {{ 'active' if request.path == url_for('settings.settings_page') }}">
+                        <i class="bi bi-gear-fill"></i> Settings
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ url_for('auth.logout') }}" class="sidebar-nav-link text-danger op-75">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content (Authenticated) -->
+        <div class="main-container">
+            <header class="top-bar">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end me-2">
+                        <div class="fw-bold small">{{ current_user.username }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{
+                            current_user.organization.plan_id|capitalize }} Plan</div>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=0055ff&color=fff"
+                        class="rounded-circle" width="40" height="40">
+                </div>
+            </header>
+            <main class="content-area">
+                {% else %}
+                <!-- Public Layout -->
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+                    <div class="container">
+                        <a class="navbar-brand fw-bold fs-4" href="{{ url_for('main.index') }}">Swift<span
+                                class="text-primary">Invoice</span></a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.index') }}">Home</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.pricing') }}">Pricing</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">Signup</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                <div class="container">
+                    {% endif %}
+
+                    <!-- Unified Flash Messages & Content Block -->
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    {% block content %}{% endblock %}
+
+                    {% if current_user.is_authenticated %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+    </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

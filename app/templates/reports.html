@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">Reports</h1>
+        <p class="text-muted small mb-0">Revenue and collections overview</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="small text-muted text-uppercase">Total Invoiced</div>
+                <div class="h4 fw-bold mb-0">${{ "{:,.2f}".format(total_invoiced) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="small text-muted text-uppercase">Collected</div>
+                <div class="h4 fw-bold text-success mb-0">${{ "{:,.2f}".format(total_paid) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="small text-muted text-uppercase">Outstanding</div>
+                <div class="h4 fw-bold text-warning mb-0">${{ "{:,.2f}".format(total_unpaid) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="small text-muted text-uppercase">Collection Rate</div>
+                <div class="h4 fw-bold mb-0">{{ "{:.1f}".format(collection_rate) }}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm p-3">
+            <h6 class="fw-bold mb-3">Revenue Trend (Last 6 Months)</h6>
+            <div style="height: 260px;">
+                <canvas id="reportsRevenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="fw-bold mb-0">Top Clients</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Client</th>
+                            <th>Total</th>
+                            <th>Unpaid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in top_clients %}
+                        <tr>
+                            <td>{{ c.name }}</td>
+                            <td>${{ "{:,.2f}".format(c.total) }}</td>
+                            <td>${{ "{:,.2f}".format(c.unpaid) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No data yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const reportCtx = document.getElementById('reportsRevenueChart').getContext('2d');
+    new Chart(reportCtx, {
+        type: 'bar',
+        data: {
+            labels: JSON.parse('{{ report_labels | tojson | safe }}'),
+            datasets: [{
+                label: 'Revenue',
+                data: JSON.parse('{{ report_values | tojson | safe }}'),
+                backgroundColor: 'rgba(0, 85, 255, 0.3)',
+                borderColor: '#0055ff',
+                borderWidth: 1.5
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

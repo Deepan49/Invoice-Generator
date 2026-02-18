@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Upgrade Plan{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="h3 text-gray-800">Choose Your Plan</h1>
+    <p class="lead">Unlock unlimited invoicing and advanced features.</p>
+</div>
+
+<div class="row justify-content-center">
+    <!-- Free Plan -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100 border-left-secondary">
+            <div class="card-body">
+                <h5 class="card-title text-center text-uppercase text-secondary">Free</h5>
+                <h6 class="card-price text-center">$0<span class="period">/month</span></h6>
+                <hr>
+                <ul class="fa-ul">
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>5 Invoices per month</li>
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Basic Dashboard</li>
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Standard Support</li>
+                    <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Recurring Invoices
+                    </li>
+                    <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Remove Branding</li>
+                </ul>
+                <div class="d-grid mt-4">
+                    {% if current_user.organization.plan_id == 'free' %}
+                    <button class="btn btn-secondary disabled">Current Plan</button>
+                    {% else %}
+                    <form action="{{ url_for('settings.downgrade_plan') }}" method="POST">
+                        <button class="btn btn-outline-secondary btn-block">Downgrade</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pro Plan -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow h-100 border-left-primary transform-scale-hover">
+            <div class="card-body">
+                <h5 class="card-title text-center text-uppercase text-primary">Pro</h5>
+                <h6 class="card-price text-center">$29<span class="period">/month</span></h6>
+                <hr>
+                <ul class="fa-ul">
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span><strong>Unlimited</strong> Invoices</li>
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Recurring Invoices</li>
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Advanced Reports</li>
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Priority Support</li>
+                    <li><span class="fa-li"><i class="fas fa-check"></i></span>Custom Branding</li>
+                </ul>
+                <div class="d-grid mt-4">
+                    {% if current_user.organization.plan_id == 'pro' %}
+                    <button class="btn btn-primary disabled">Current Plan</button>
+                    {% else %}
+                    <form action="{{ url_for('settings.upgrade_plan') }}" method="POST">
+                        <input type="hidden" name="plan" value="pro">
+                        <button class="btn btn-primary btn-block">Upgrade to Pro</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
