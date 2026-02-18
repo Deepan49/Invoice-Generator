@@ -7,23 +7,40 @@ from app.extensions import db, limiter
 bp = Blueprint('auth', __name__)
 
 @bp.route('/login', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = request.form.get('password') or ''
+        
+        print(f"DEBUG: Login Request - Email: {email}, Pwd Length: {len(password)}")
 
         if not email or not password:
+            print("DEBUG: Missing email or password")
             flash('Email and password are required.')
             return redirect(url_for('auth.login'))
 
         user = User.query.filter_by(email=email).first()
+        print(f"DEBUG: Found user? {user is not None}")
         
-        if not user or not check_password_hash(user.password, password):
+        if not user:
+            print(f"DEBUG: User search failed for {email}")
+            flash('Login failed. Check your credentials.')
+            return redirect(url_for('auth.login'))
+            
+        pwd_match = check_password_hash(user.password, password)
+        print(f"DEBUG: Password match result: {pwd_match}")
+        
+        if not pwd_match:
+            print(f"DEBUG: Password mismatch for user {user.email}")
+            # Diagnostic: Show the stored hash prefix
+            print(f"DEBUG: Stored hash prefix: {user.password[:20]}...")
             flash('Login failed. Check your credentials.')
             return redirect(url_for('auth.login'))
         
+        print(f"DEBUG: Login successful for {user.email}. Setting session...")
         login_user(user)
+        print(f"DEBUG: Redirecting to dashboard...")
         return redirect(url_for('main.dashboard'))
         
     return render_template('login.html')

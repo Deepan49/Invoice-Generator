@@ -1,3 +1,9 @@
+from .auth import bp as auth_bp
+from .main import bp as main_bp
+from .invoices import bp as invoices_bp
+from .clients import bp as clients_bp
+from .products import bp as products_bp
+from .settings import bp as settings_bp
 from .admin import bp as admin_bp
 from .api import bp as api_bp
 from .webhooks import bp as webhooks_bp
