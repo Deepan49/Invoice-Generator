@@ -8,3 +8,8 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 limiter = Limiter(key_func=get_remote_address)
+
+@login_manager.user_loader
+def load_user(user_id):
+    from app.models.user import User
+    return User.query.get(int(user_id))

@@ -38,6 +38,9 @@ def create_app(config_name='default'):
     from app.utils.helpers import nl2br
     app.jinja_env.filters['nl2br'] = nl2br
     
+    # Register models to ensure user_loader and other callbacks are registered
+    from .models.user import User
+    
     return app
 
 def create_celery_app(config_name='default'):

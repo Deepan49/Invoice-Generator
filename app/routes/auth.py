@@ -7,7 +7,7 @@ from app.extensions import db, limiter
 bp = Blueprint('auth', __name__)
 
 @bp.route('/login', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
