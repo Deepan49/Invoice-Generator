@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4 text-gray-800">Settings</h1>
+
+<form method="POST" action="{{ url_for('settings.settings_page') }}" enctype="multipart/form-data">
+    <input type="hidden" name="section" value="all">
+
+    <div class="row">
+        <div class="col-lg-6">
+            <!-- Organization Profile -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Organization Profile</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Company Name</label>
+                        <input type="text" name="business_name" class="form-control"
+                            value="{{ current_user.organization.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea name="business_address" class="form-control"
+                            rows="3">{{ current_user.organization.address }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">GSTIN / Tax ID</label>
+                        <input type="text" name="gstin" class="form-control"
+                            value="{{ current_user.organization.gstin or '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <!-- Invoice Settings -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Invoice Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Invoice Prefix</label>
+                            <input type="text" name="invoice_prefix" class="form-control"
+                                value="{{ current_user.organization.settings.invoice_prefix }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Padding (Digits)</label>
+                            <input type="number" name="invoice_padding" class="form-control"
+                                value="{{ current_user.organization.settings.invoice_padding }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Currency</label>
+                        <select name="currency" class="form-select">
+                            <option value="USD" {% if current_user.organization.settings.currency=='USD' %}selected{%
+                                endif %}>USD ($)</option>
+                            <option value="EUR" {% if current_user.organization.settings.currency=='EUR' %}selected{%
+                                endif %}>EUR (€)</option>
+                            <option value="GBP" {% if current_user.organization.settings.currency=='GBP' %}selected{%
+                                endif %}>GBP (£)</option>
+                            <option value="INR" {% if current_user.organization.settings.currency=='INR' %}selected{%
+                                endif %}>INR (₹)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary btn-lg px-5">Save All Settings</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

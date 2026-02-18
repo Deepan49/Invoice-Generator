@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-11">
+        <div class="card p-5">
+            <form method="POST" enctype="multipart/form-data" id="invoiceForm">
+                <!-- Professional Header -->
+                <div class="row mb-5 align-items-center">
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3"
+                                style="width: 80px; height: 80px; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc;">
+                                <span class="text-muted small text-center" id="logoPlaceholder">Add Logo</span>
+                                <img id="logoPreview" class="d-none w-100 h-100" style="object-fit: contain;">
+                            </div>
+                            <div>
+                                <h3 class="fw-bold mb-1 text-primary">{{ current_user.business_name or 'Your Business'
+                                    }}</h3>
+                                <p class="text-muted small mb-0">{{ current_user.business_address or 'Update your
+                                    address in Settings' }}</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <input type="file" name="logo" class="form-control form-control-sm" accept="image/*"
+                                id="logoInput" style="width: 250px;">
+                        </div>
+                    </div>
+                    <div class="col-md-5 text-end">
+                        <select name="type"
+                            class="form-select form-select-lg fw-bold text-end border-0 bg-transparent mb-1"
+                            id="invoiceTypeSelect" style="font-size: 2.5rem; color: #0a2540; cursor: pointer;">
+                            <option value="Invoice" selected>INVOICE</option>
+                            <option value="Proforma">PROFORMA</option>
+                            <option value="Credit Note">CREDIT NOTE</option>
+                            <option value="Debit Note">DEBIT NOTE</option>
+                        </select>
+                        <p class="text-muted mb-0"># {{ next_invoice_number }}</p>
+                        <p class="text-muted small">Date: {{ today_date }}</p>
+
+                        <div class="form-check form-switch d-flex justify-content-end align-items-center gap-2 mt-2">
+                            <input class="form-check-input" type="checkbox" id="recurringCheck" name="is_recurring">
+                            <label class="form-check-label small text-muted" for="recurringCheck">Make Recurring</label>
+                        </div>
+                        <div class="d-none justify-content-end mt-1" id="frequencyDiv">
+                            <select name="recurring_frequency" class="form-select form-select-sm" style="width: auto;">
+                                <option value="Monthly">Monthly</option>
+                                <option value="Weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-5 border-2 opacity-10">
+
+                <!-- Details Section -->
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <h6 class="text-uppercase fw-bold text-secondary small mb-3">Bill To:</h6>
+                        <select name="client_id" class="form-select mb-2" required>
+                            <option value="" disabled selected>Choose a client...</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <textarea class="form-control bg-light border-0 small" rows="2"
+                            placeholder="Client delivery address (optional)" readonly id="clientDisplay"></textarea>
+                    </div>
+                    <div class="col-md-5 offset-md-1">
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted fw-semibold py-2">Due Date:</div>
+                            <div class="col-7"><input type="date" name="due_date" class="form-control" required></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted fw-semibold py-2">Currency:</div>
+                            <div class="col-7">
+                                <select name="currency" class="form-select" id="currencySelect">
+                                    <option value="USD">$ USD</option>
+                                    <option value="EUR">€ EUR</option>
+                                    <option value="INR">₹ INR</option>
+                                    <option value="GBP">£ GBP</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Items Table -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-uppercase fw-bold text-secondary small mb-0">Line Items</h6>
+                    <button type="button" class="btn btn-outline-primary btn-sm px-3" id="addRow">+ Add Item</button>
+                </div>
+
+                <div class="table-responsive border rounded-3 mb-4">
+                    <table class="table mb-0" id="itemsTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 50%;">Item & Description</th>
+                                <th style="width: 12%;">Qty</th>
+                                <th style="width: 15%;">Rate</th>
+                                <th style="width: 15%;">Amount</th>
+                                <th style="width: 8%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            <tr class="align-middle border-bottom">
+                                <td class="p-3"><input type="text" name="description[]"
+                                        class="form-control border-0 bg-transparent"
+                                        placeholder="Describe your service or product" required></td>
+                                <td class="p-3"><input type="number" name="quantity[]"
+                                        class="form-control border-0 bg-transparent qty" step="0.1" value="1" required>
+                                </td>
+                                <td class="p-3"><input type="number" name="rate[]"
+                                        class="form-control border-0 bg-transparent rate" step="0.01" value="0.00"
+                                        required></td>
+                                <td class="p-3 fw-bold text-end pe-4"><span class="item-total-text">0.00</span></td>
+                                <td class="p-2 text-center text-muted"><i class="remove-row"
+                                        style="cursor: pointer;">&times;</i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Footer -->
+                <div class="row mt-5">
+                    <div class="col-md-7">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary small">NOTES / TERMS</label>
+                            <textarea name="notes" class="form-control border-0 bg-light" rows="4"
+                                placeholder="Important info (e.g., payment methods, thank you message)"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="p-4 rounded-4" style="background: #f1f5f9;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal:</span>
+                                <span class="fw-semibold" id="subtotalDisplay">0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Tax Rate (%):</span>
+                                <input type="number" name="tax_rate" class="form-control bg-white border-0 py-1 px-2"
+                                    id="taxRateInput" value="0" style="width: 60px;">
+                            </div>
+                            <div class="total-accent-box d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">TOTAL</span>
+                                <span class="amount"><span class="currency-symbol">$</span><span
+                                        id="grandTotalDisplay">0.00</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-4 border-top d-flex gap-3 justify-content-end">
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" name="status" value="Draft" class="btn btn-outline-primary px-4">Save as
+                        Draft</button>
+                    <button type="submit" name="status" value="Unpaid" class="btn btn-primary px-5 fw-bold">Create
+                        Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const itemsBody = document.getElementById('itemsBody');
+        const addRowBtn = document.getElementById('addRow');
+        const subtotalDisplay = document.getElementById('subtotalDisplay');
+        const taxRateInput = document.getElementById('taxRateInput');
+        const grandTotalDisplay = document.getElementById('grandTotalDisplay');
+        const currencySelect = document.getElementById('currencySelect');
+        const currencySymbols = document.querySelectorAll('.currency-symbol');
+        const logoInput = document.getElementById('logoInput');
+        const logoPreview = document.getElementById('logoPreview');
+        const logoPlaceholder = document.getElementById('logoPlaceholder');
+        const invoiceTypeSelect = document.getElementById('invoiceTypeSelect');
+
+        const symbols = { 'USD': '$', 'EUR': '€', 'INR': '₹', 'GBP': '£' };
+
+        function calculateTotals() {
+            let subtotal = 0;
+            itemsBody.querySelectorAll('tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const rate = parseFloat(row.querySelector('.rate').value) || 0;
+                const itemTotal = qty * rate;
+                row.querySelector('.item-total-text').textContent = itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                subtotal += itemTotal;
+            });
+
+            const taxRate = parseFloat(taxRateInput.value) || 0;
+            const taxAmount = subtotal * (taxRate / 100);
+            const grandTotal = subtotal + taxAmount;
+
+            subtotalDisplay.textContent = subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            grandTotalDisplay.textContent = grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+        }
+
+        addRowBtn.addEventListener('click', function () {
+            const newRow = `
+            <tr class="align-middle border-bottom">
+                <td class="p-3"><input type="text" name="description[]" class="form-control border-0 bg-transparent" placeholder="Describe your service or product" required></td>
+                <td class="p-3"><input type="number" name="quantity[]" class="form-control border-0 bg-transparent qty" step="0.1" value="1" required></td>
+                <td class="p-3"><input type="number" name="rate[]" class="form-control border-0 bg-transparent rate" step="0.01" value="0.00" required></td>
+                <td class="p-3 fw-bold text-end pe-4"><span class="item-total-text">0.00</span></td>
+                <td class="p-2 text-center text-muted"><i class="remove-row" style="cursor: pointer; font-size: 1.5rem;">&times;</i></td>
+            </tr>
+        `;
+            itemsBody.insertAdjacentHTML('beforeend', newRow);
+        });
+
+        itemsBody.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-row')) {
+                if (itemsBody.rows.length > 1) {
+                    e.target.closest('tr').remove();
+                    calculateTotals();
+                }
+            }
+        });
+
+        itemsBody.addEventListener('input', calculateTotals);
+        taxRateInput.addEventListener('input', calculateTotals);
+
+        currencySelect.addEventListener('change', function () {
+            const symbol = symbols[this.value] || '$';
+            currencySymbols.forEach(s => s.textContent = symbol);
+        });
+
+        logoInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    logoPreview.src = e.target.result;
+                    logoPreview.classList.remove('d-none');
+                    logoPlaceholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Client Details
+        const clientSelect = document.getElementById('clientSelect');
+        const clientDetails = document.getElementById('clientDetails');
+        clientSelect.addEventListener('change', function () {
+            const option = this.selectedOptions[0];
+            if (option && option.value) {
+                document.getElementById('clientAddress').textContent = option.dataset.address || 'N/A';
+                document.getElementById('clientEmail').textContent = option.dataset.email || 'N/A';
+                document.getElementById('clientPhone').textContent = option.dataset.phone || 'N/A';
+                document.getElementById('clientGstin').textContent = option.dataset.gstin || 'N/A';
+                clientDetails.classList.remove('d-none');
+            } else {
+                clientDetails.classList.add('d-none');
+            }
+        });
+
+        // Recurring Toggle
+        const recurringCheck = document.getElementById('recurringCheck');
+        const frequencyDiv = document.getElementById('frequencyDiv');
+        if (recurringCheck) {
+            recurringCheck.addEventListener('change', function () {
+                if (this.checked) {
+                    frequencyDiv.classList.remove('d-none');
+                    frequencyDiv.classList.add('d-flex');
+                } else {
+                    frequencyDiv.classList.add('d-none');
+                    frequencyDiv.classList.remove('d-flex');
+                }
+            });
+        }
+
+    });
+</script>
+{% endblock %}

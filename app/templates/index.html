@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="display-3 fw-bold">SwiftInvoice</h1>
+    <p class="lead">The Fast, Professional Way to Manage Freelance Billing.</p>
+    <div class="mt-4 d-flex justify-content-center gap-3">
+        <a href="{{ url_for('auth.signup') }}" class="btn btn-light btn-lg fw-bold px-5">Start Billing Now</a>
+        <a href="{{ url_for('main.pricing') }}" class="btn btn-outline-light btn-lg px-4">View Pricing</a>
+    </div>
+</div>
+
+<div class="row mt-5 text-center">
+    <div class="col-md-4">
+        <h3>Create Invoices</h3>
+        <p>Generate professional invoices in seconds.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Track Payments</h3>
+        <p>Know exactly who owes you and how much.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>PDF Export</h3>
+        <p>Download your invoices as PDF to send to clients.</p>
+    </div>
+</div>
+{% endblock %}

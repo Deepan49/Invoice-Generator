@@ -1,0 +1,195 @@
+:root {
+    --primary-color: #0055ff;
+    --secondary-color: #64748b;
+    --dark-blue: #0f172a;
+    --bg-light: #f8fafc;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --sidebar-width: 260px;
+    --border-radius: 12px;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--dark-blue);
+    overflow-x: hidden;
+}
+
+/* Layout Architecture */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--dark-blue);
+    color: white;
+    position: fixed;
+    height: 100vh;
+    padding: 2rem 1.5rem;
+    z-index: 1000;
+}
+
+.main-container {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.content-area {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+/* Sidebar Nav */
+.sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 3rem;
+    display: block;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    color: #94a3b8;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-nav-link i {
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
+
+.sidebar-nav-link:hover,
+.sidebar-nav-link.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Cards & Stats */
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    background: white;
+}
+
+.stat-card {
+    padding: 1.2rem;
+}
+
+.stat-card .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 0.2rem;
+}
+
+/* Icons for Stats */
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.bg-primary-soft {
+    background-color: rgba(0, 85, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.bg-success-soft {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #166534;
+}
+
+.bg-warning-soft {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+}
+
+.bg-info-soft {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: #075985;
+}
+
+/* Dashboard Specific */
+.quick-action-btn {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: var(--dark-blue);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: var(--primary-color);
+}
+
+.hero-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+    color: white;
+    border-radius: 20px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .main-container {
+        margin-left: 0;
+    }
+}

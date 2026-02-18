@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Reports{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Platform Reports</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="text-gray-500 hover:text-gray-700">Back to Dashboard</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-xs uppercase text-gray-500">Users</div>
+            <div class="text-2xl font-bold text-gray-900">{{ total_users }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-xs uppercase text-gray-500">Organizations</div>
+            <div class="text-2xl font-bold text-gray-900">{{ total_orgs }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-xs uppercase text-gray-500">Invoices</div>
+            <div class="text-2xl font-bold text-gray-900">{{ total_invoices }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-xs uppercase text-gray-500">Revenue</div>
+            <div class="text-2xl font-bold text-green-700">${{ "{:,.2f}".format(total_revenue) }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-xs uppercase text-gray-500">Paid</div>
+            <div class="text-2xl font-bold text-emerald-700">${{ "{:,.2f}".format(paid_revenue) }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-xs uppercase text-gray-500">Unpaid</div>
+            <div class="text-2xl font-bold text-amber-700">${{ "{:,.2f}".format(unpaid_revenue) }}</div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Monthly Revenue</h2>
+        <div style="height: 300px;">
+            <canvas id="adminRevenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const adminCtx = document.getElementById('adminRevenueChart').getContext('2d');
+    new Chart(adminCtx, {
+        type: 'line',
+        data: {
+            labels: JSON.parse('{{ report_labels | tojson | safe }}'),
+            datasets: [{
+                label: 'Revenue',
+                data: JSON.parse('{{ report_values | tojson | safe }}'),
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                fill: true,
+                tension: 0.35
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-0">Business Profile</h2>
+    <p class="text-muted small">Update your business details to customize your generated invoices.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-4">Branding & Identity</h5>
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-secondary">BUSINESS NAME</label>
+                    <input type="text" name="business_name" class="form-control form-control-lg"
+                        value="{{ current_user.business_name or '' }}" placeholder="e.g. Acme Billing Solutions"
+                        required>
+                    <div class="form-text">This will be shown as the main sender name.</div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-secondary">BUSINESS ADDRESS</label>
+                    <textarea name="business_address" class="form-control" rows="4"
+                        placeholder="123 Business Way, Suite 100&#10;City, Country"
+                        required>{{ current_user.business_address or '' }}</textarea>
+                    <div class="form-text">Your full address, including tax registration if applicable.</div>
+                </div>
+                <hr class="my-4 op-10">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Update Business Details</button>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card bg-primary-soft border-0 p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-info-circle-fill me-2"></i>Why is this important?</h5>
+            <p class="text-muted small">Your business profile is used to generate legally compliant invoices for your
+                clients. Accurate address and naming help you get paid faster and look more professional.</p>
+            <div class="mt-auto">
+                <div class="p-3 bg-white rounded-3 shadow-sm">
+                    <div class="text-primary fw-bold small mb-1">PRO TIP</div>
+                    <p class="mb-0 small text-muted">A clear business name and professional address increases client
+                        trust by up to 40%.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

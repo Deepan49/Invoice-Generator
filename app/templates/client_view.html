@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}{{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('clients.index') }}" class="text-decoration-none text-muted small"><i
+                class="bi bi-arrow-left me-1"></i> Back to Customers</a>
+        <h1 class="h3 text-gray-800 mt-1">{{ client.name }}</h1>
+    </div>
+    <div>
+        <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editClientModal">
+            <i class="bi bi-pencil me-1"></i> Edit Profile
+        </button>
+        <form action="{{ url_for('clients.delete', client_id=client.id) }}" method="POST" class="d-inline"
+            onsubmit="return confirm('Delete this customer? All invoices will also be deleted!');">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Stats Cards -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Outstanding Balance</h6>
+                <h2 class="text-danger fw-bold mb-0">${{ "%.2f"|format(outstanding) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Total Invoiced</h6>
+                <h2 class="text-primary fw-bold mb-0">${{ "%.2f"|format(total_invoiced) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small fw-bold">Total Paid</h6>
+                <h2 class="text-success fw-bold mb-0">${{ "%.2f"|format(total_paid) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Profile Info -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Contact Details</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Email:</strong> <a href="mailto:{{ client.email }}">{{ client.email }}</a></p>
+                <p class="mb-1"><strong>Phone:</strong> {{ client.phone or 'N/A' }}</p>
+                <p class="mb-1"><strong>GSTIN:</strong> {{ client.gstin or 'N/A' }}</p>
+                <hr>
+                <p class="mb-1"><strong>Billing Address:</strong><br>
+                    {{ client.billing_address|default('N/A')|nl2br }}</p>
+                <hr>
+                <p class="mb-1"><strong>Shipping Address:</strong><br>
+                    {{ client.shipping_address|default('N/A')|nl2br }}</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Notes & Terms</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Default Terms:</strong><br>{{ client.payment_terms or 'None' }}</p>
+                <p class="mb-0"><strong>Internal Notes:</strong><br>{{ client.notes or 'None' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice History -->
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Invoice History</h6>
+                <a href="{{ url_for('invoices.create') }}" class="btn btn-sm btn-primary">New Invoice</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Invoice #</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in client.invoices|sort(attribute='id', reverse=True) %}
+                            <tr>
+                                <td class="ps-4 fw-bold">{{ invoice.invoice_number }}</td>
+                                <td>{{ invoice.issue_date.strftime('%d %b %Y') }}</td>
+                                <td>${{ "%.2f"|format(invoice.amount) }}</td>
+                                <td>
+                                    <span
+                                        class="badge rounded-pill bg-{{ 'success' if invoice.status=='Paid' else 'warning' if invoice.status=='Unpaid' else 'secondary' }}">
+                                        {{ invoice.status }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{{ url_for('invoices.toggle_status', invoice_id=invoice.id) }}"
+                                        class="btn btn-sm btn-light">Toggle</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">No invoices found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editClientModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('clients.edit', client_id=client.id) }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Customer Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ client.name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ client.email }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" class="form-control" value="{{ client.phone or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">GSTIN/Tax ID</label>
+                            <input type="text" name="gstin" class="form-control" value="{{ client.gstin or '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Billing Address</label>
+                            <textarea name="billing_address" class="form-control"
+                                rows="2">{{ client.billing_address or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Shipping Address</label>
+                            <textarea name="shipping_address" class="form-control"
+                                rows="2">{{ client.shipping_address or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Payment Terms</label>
+                            <textarea name="payment_terms" class="form-control"
+                                rows="2">{{ client.payment_terms or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Internal Notes</label>
+                            <textarea name="notes" class="form-control" rows="2">{{ client.notes or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

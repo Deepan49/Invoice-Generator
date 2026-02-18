@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Dashboard</h3>
+        <p class="text-muted small mb-0 font-outfit">Overview of your business performance</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('invoices.create') }}" class="btn btn-primary btn-sm fw-bold px-3">
+            <i class="bi bi-plus-lg me-1"></i> New Invoice
+        </a>
+        <a href="{{ url_for('main.reports') }}" class="btn btn-outline-secondary btn-sm fw-bold px-3">
+            <i class="bi bi-bar-chart-line me-1"></i> Reports
+        </a>
+        <a href="{{ url_for('clients.index') }}" class="btn btn-outline-primary btn-sm fw-bold px-3">
+            <i class="bi bi-person-plus-fill me-1"></i> Add Client
+        </a>
+    </div>
+</div>
+
+<!-- Row 1: Stats & Chart -->
+<div class="row g-3 mb-4">
+    <div class="col-md-5">
+        <div class="row g-3">
+            <div class="col-6">
+                <div class="card stat-card border-0 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="stat-icon bg-success-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <div class="label" style="font-size: 0.65rem;">Paid</div>
+                    </div>
+                    <div class="value" style="font-size: 1.25rem;">${{ "{:,.0f}".format(total_revenue) }}</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card stat-card border-0 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="stat-icon bg-warning-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="label" style="font-size: 0.65rem;">Unpaid</div>
+                    </div>
+                    <div class="value" style="font-size: 1.25rem;">${{ "{:,.0f}".format(unpaid_amount) }}</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card stat-card border-0 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="stat-icon bg-primary-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="label" style="font-size: 0.65rem;">Clients</div>
+                    </div>
+                    <div class="value" style="font-size: 1.25rem;">{{ client_count }}</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card stat-card border-0 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="stat-icon bg-info-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;"><i
+                                class="bi bi-file-earmark-text"></i></div>
+                        <div class="label" style="font-size: 0.65rem;">Invoices</div>
+                    </div>
+                    <div class="value" style="font-size: 1.25rem;">{{ invoice_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0 small text-uppercase text-secondary" style="letter-spacing: 0.5px;">Revenue
+                    Trend</h6>
+                <span class="badge bg-primary-soft text-primary" style="font-size: 0.65rem;">Last 6 Months</span>
+            </div>
+            <div style="height: 120px;">
+                <canvas id="earningsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Invoices Table -->
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold mb-0 small text-uppercase text-secondary" style="letter-spacing: 0.5px;">Recent activity</h6>
+        <a href="{{ url_for('invoices.index') }}" class="text-primary small text-decoration-none fw-bold">View All</a>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive" style="max-height: 320px;">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Invoice #</th>
+                        <th>Client</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td class="ps-4 fw-semibold text-primary">{{ invoice.invoice_number }}</td>
+                        <td>
+                            <div class="fw-bold">{{ invoice.client.name }}</div>
+                            <div class="text-muted small">{{ invoice.client.email }}</div>
+                        </td>
+                        <td class="fw-bold">${{ "{:,.2f}".format(invoice.amount) }}</td>
+                        <td>{{ invoice.due_date.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <span
+                                class="badge rounded-pill {% if invoice.status == 'Paid' %}bg-success-soft{% elif invoice.status == 'Unpaid' %}bg-warning-soft{% else %}bg-secondary-soft{% endif %} px-3 py-2">
+                                {{ invoice.status }}
+                            </span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                    <li><a class="dropdown-item"
+                                            href="{{ url_for('invoices.download_pdf', invoice_id=invoice.id) }}"><i
+                                                class="bi bi-file-pdf me-2"></i>Download PDF</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ url_for('invoices.send_email', invoice_id=invoice.id) }}"><i
+                                                class="bi bi-envelope me-2"></i>Email Client</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item text-primary"
+                                            href="{{ url_for('invoices.toggle_status', invoice_id=invoice.id) }}"><i
+                                                class="bi bi-arrow-repeat me-2"></i>Toggle Status</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                            <p class="mb-0">No invoices yet. <a href="{{ url_for('invoices.create') }}"
+                                    class="text-primary fw-bold">Create your first one!</a></p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('earningsChart').getContext('2d');
+
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 85, 255, 0.1)');
+    gradient.addColorStop(1, 'rgba(0, 85, 255, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: JSON.parse('{{ chart_labels | tojson | safe }}'),
+            datasets: [{
+                label: 'Monthly Earnings',
+                data: JSON.parse('{{ chart_values | tojson | safe }}'),
+                borderColor: '#0055ff',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 2,
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 1,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: '#0055ff',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    padding: 8,
+                    bodyFont: { family: 'Outfit', size: 12 },
+                    titleFont: { family: 'Outfit', size: 10, weight: 'normal' },
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+                            if (label) { label += ': '; }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    display: false,
+                    beginAtZero: true
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
+            },
+            layout: {
+                padding: { top: 5, bottom: 0, left: 0, right: 0 }
+            }
+        }
+    });
+</script>
+{% endblock %}
