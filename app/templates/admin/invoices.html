@@ -1,40 +1,51 @@
-{% extends "admin/base.html" %}
+{% extends "admin/base_admin.html" %}
 
-{% block title %}Admin Invoices{% endblock %}
-
-{% block content %}
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900">All Invoices</h1>
-        <a href="{{ url_for('admin.dashboard') }}" class="text-gray-500 hover:text-gray-700">Back to Dashboard</a>
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Global Invoices</h2>
+        <div class="d-flex gap-2">
+            <select class="form-select form-select-sm w-auto">
+                <option value="">All Statuses</option>
+                <option>Paid</option>
+                <option>Unpaid</option>
+                <option>Overdue</option>
+            </select>
+        </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-600">
-                <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-medium">
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
                     <tr>
-                        <th class="px-6 py-3">Invoice #</th>
-                        <th class="px-6 py-3">Organization</th>
-                        <th class="px-6 py-3">Client</th>
-                        <th class="px-6 py-3">Amount</th>
-                        <th class="px-6 py-3">Status</th>
-                        <th class="px-6 py-3">Due Date</th>
+                        <th>Invoice #</th>
+                        <th>Organization</th>
+                        <th>Client</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
-                    {% for invoice in invoices %}
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 font-medium text-gray-900">{{ invoice.invoice_number }}</td>
-                        <td class="px-6 py-4">{{ invoice.organization.name if invoice.organization else '-' }}</td>
-                        <td class="px-6 py-4">{{ invoice.client.name if invoice.client else '-' }}</td>
-                        <td class="px-6 py-4">{{ "{:,.2f}".format(invoice.amount) }} {{ invoice.currency }}</td>
-                        <td class="px-6 py-4">{{ invoice.status }}</td>
-                        <td class="px-6 py-4">{{ invoice.due_date.strftime('%d %b %Y') }}</td>
-                    </tr>
-                    {% else %}
+                <tbody>
+                    {% for inv in invoices %}
                     <tr>
-                        <td colspan="6" class="px-6 py-6 text-center text-gray-400">No invoices found.</td>
+                        <td class="fw-bold">{{ inv.invoice_number }}</td>
+                        <td class="small">{{ inv.organization.name }}</td>
+                        <td>{{ inv.client.name }}</td>
+                        <td class="fw-bold">${{ "{:,.2f}".format(inv.amount) }}</td>
+                        <td>
+                            <span
+                                class="badge bg-{{ 'success' if inv.status == 'Paid' else 'warning' if inv.status == 'Unpaid' else 'danger' }}">
+                                {{ inv.status }}
+                            </span>
+                        </td>
+                        <td class="small">{{ inv.issue_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-light border"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-light border text-danger"><i class="bi bi-trash"></i></button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

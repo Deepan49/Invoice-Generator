@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
-from app.models import User, Organization, OrganizationSettings
+from app.models.user import User
 from app.extensions import db, limiter
+from app.services.security_service import SecurityService
+from datetime import datetime, timedelta
 
 bp = Blueprint('auth', __name__)
 
@@ -19,11 +21,39 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         
-        if not user or not check_password_hash(user.password, password):
+        # Brute-force protection
+        if user and user.locked_until and user.locked_until > datetime.utcnow():
+            flash(f'Account locked. Try again after {user.locked_until.strftime("%H:%M:%S")}')
+            return redirect(url_for('auth.login'))
+
+        if not user or not user.check_password(password):
+            if user:
+                user.login_attempts += 1
+                if user.login_attempts >= 5:
+                    user.locked_until = datetime.utcnow() + timedelta(minutes=15)
+                    flash('Too many failed attempts. Account locked for 15 minutes.')
+                db.session.commit()
+                SecurityService.log_login(user.id, success=False)
             flash('Login failed. Check your credentials.')
             return redirect(url_for('auth.login'))
         
+        if user.is_suspended:
+            flash('Your account has been suspended. Please contact support.')
+            return redirect(url_for('auth.login'))
+        
+        # Reset attempts on success
+        user.login_attempts = 0
+        user.locked_until = None
+        db.session.commit()
+
+        # 2FA Redirection
+        if user.role == 'super_admin' and user.twofa_enabled:
+            session['2fa_user_id'] = user.id
+            return redirect(url_for('admin_security.verify_2fa'))
+
         login_user(user)
+        log = SecurityService.log_login(user.id, success=True)
+        SecurityService.send_login_alert(user, log)
         return redirect(url_for('main.dashboard'))
         
     return render_template('login.html')

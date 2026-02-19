@@ -1,6 +1,6 @@
 from flask import Flask
 from config import config
-from .extensions import db, login_manager, migrate, limiter
+from .extensions import db, login_manager, migrate, limiter, mail, csrf
 from .celery_utils import make_celery
 from whitenoise import WhiteNoise
 
@@ -15,6 +15,8 @@ def create_app(config_name='default'):
     login_manager.init_app(app)
     migrate.init_app(app, db)
     limiter.init_app(app)
+    mail.init_app(app)
+    csrf.init_app(app)
     
     # Setup Structured Logging
     from .utils.structured_logger import setup_logging
