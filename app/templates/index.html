@@ -1,27 +1,56 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="hero-section">
-    <h1 class="display-3 fw-bold">SwiftInvoice</h1>
-    <p class="lead">The Fast, Professional Way to Manage Freelance Billing.</p>
-    <div class="mt-4 d-flex justify-content-center gap-3">
-        <a href="{{ url_for('auth.signup') }}" class="btn btn-light btn-lg fw-bold px-5">Start Billing Now</a>
-        <a href="{{ url_for('main.pricing') }}" class="btn btn-outline-light btn-lg px-4">View Pricing</a>
+<div class="hero-section mb-5">
+    <div class="container py-5">
+        <h1 class="display-1 fw-bold mb-3" style="letter-spacing: -2px;">SwiftInvoice</h1>
+        <p class="lead fs-4 opacity-100 mb-5 mx-auto" style="max-width: 700px; font-weight: 500;">
+            Elevate your freelance billing with precision engineering and professional aesthetics.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-lg px-5 py-3 shadow-lg">
+                Start Free Trial
+            </a>
+            <a href="{{ url_for('main.pricing') }}" class="btn btn-outline-light btn-lg px-5 py-3 border-2">
+                View Pricing
+            </a>
+        </div>
     </div>
 </div>
 
-<div class="row mt-5 text-center">
-    <div class="col-md-4">
-        <h3>Create Invoices</h3>
-        <p>Generate professional invoices in seconds.</p>
-    </div>
-    <div class="col-md-4">
-        <h3>Track Payments</h3>
-        <p>Know exactly who owes you and how much.</p>
-    </div>
-    <div class="col-md-4">
-        <h3>PDF Export</h3>
-        <p>Download your invoices as PDF to send to clients.</p>
+<div class="container py-5">
+    <div class="row g-5 text-center">
+        <div class="col-md-4">
+            <div class="card p-5 h-100 border-0 shadow-sm glass-container" style="background: rgba(255,255,255,0.4);">
+                <div class="icon-circle bg-primary bg-opacity-10 text-primary mx-auto mb-4"
+                    style="width: 80px; height: 80px; border-radius: 40px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                    <i class="bi bi-magic"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Instant Invoicing</h4>
+                <p class="text-muted mb-0">Generate professional, high-conversion invoices in under 30 seconds.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-5 h-100 border-0 shadow-sm glass-container" style="background: rgba(255,255,255,0.4);">
+                <div class="icon-circle bg-primary bg-opacity-10 text-primary mx-auto mb-4"
+                    style="width: 80px; height: 80px; border-radius: 40px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Revenue Tracking</h4>
+                <p class="text-muted mb-0">A crystal-clear dashboard to monitor your business growth and pending leads.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-5 h-100 border-0 shadow-sm glass-container" style="background: rgba(255,255,255,0.4);">
+                <div class="icon-circle bg-primary bg-opacity-10 text-primary mx-auto mb-4"
+                    style="width: 80px; height: 80px; border-radius: 40px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Premium PDF Export</h4>
+                <p class="text-muted mb-0">Beautifully typeset PDF invoices that make your brand stand out.</p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -2,157 +2,142 @@
 
 {% block content %}
 <!-- Page Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-5">
     <div>
-        <h3 class="fw-bold mb-0">Dashboard</h3>
-        <p class="text-muted small mb-0 font-outfit">Overview of your business performance</p>
+        <h2 class="fw-bold mb-1">Command Center</h2>
+        <p class="text-secondary small mb-0">Experience clarity in your business performance.</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ url_for('invoices.create') }}" class="btn btn-primary btn-sm fw-bold px-3">
-            <i class="bi bi-plus-lg me-1"></i> New Invoice
+    <div class="d-flex gap-3">
+        <a href="{{ url_for('invoices.create') }}" class="btn btn-primary shadow-sm px-4">
+            <i class="bi bi-plus-lg me-2"></i> Create Invoice
         </a>
-        <a href="{{ url_for('main.reports') }}" class="btn btn-outline-secondary btn-sm fw-bold px-3">
-            <i class="bi bi-bar-chart-line me-1"></i> Reports
-        </a>
-        <a href="{{ url_for('clients.index') }}" class="btn btn-outline-primary btn-sm fw-bold px-3">
-            <i class="bi bi-person-plus-fill me-1"></i> Add Client
-        </a>
+        <div class="dropdown">
+            <button class="btn btn-white border shadow-sm px-3" data-bs-toggle="dropdown">
+                <i class="bi bi-three-dots"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
+                <li><a class="dropdown-item" href="{{ url_for('main.reports') }}"><i class="bi bi-bar-chart me-2"></i>
+                        Reports</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('clients.index') }}"><i
+                            class="bi bi-person-plus me-2"></i> Add Client</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 
-<!-- Row 1: Stats & Chart -->
-<div class="row g-3 mb-4">
-    <div class="col-md-5">
-        <div class="row g-3">
-            <div class="col-6">
-                <div class="card stat-card border-0 shadow-sm">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="stat-icon bg-success-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
-                            <i class="bi bi-cash-stack"></i>
-                        </div>
-                        <div class="label" style="font-size: 0.65rem;">Paid</div>
-                    </div>
-                    <div class="value" style="font-size: 1.25rem;">${{ "{:,.0f}".format(total_revenue) }}</div>
-                </div>
+<!-- Row 1: Key Performance Indicators -->
+<div class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card h-100">
+            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                <i class="bi bi-cash-stack"></i>
             </div>
-            <div class="col-6">
-                <div class="card stat-card border-0 shadow-sm">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="stat-icon bg-warning-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
-                        <div class="label" style="font-size: 0.65rem;">Unpaid</div>
-                    </div>
-                    <div class="value" style="font-size: 1.25rem;">${{ "{:,.0f}".format(unpaid_amount) }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card stat-card border-0 shadow-sm">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="stat-icon bg-primary-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <div class="label" style="font-size: 0.65rem;">Clients</div>
-                    </div>
-                    <div class="value" style="font-size: 1.25rem;">{{ client_count }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card stat-card border-0 shadow-sm">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="stat-icon bg-info-soft mb-0" style="width: 32px; height: 32px; font-size: 1rem;"><i
-                                class="bi bi-file-earmark-text"></i></div>
-                        <div class="label" style="font-size: 0.65rem;">Invoices</div>
-                    </div>
-                    <div class="value" style="font-size: 1.25rem;">{{ invoice_count }}</div>
-                </div>
+            <div class="label">Total Paid</div>
+            <div class="value">${{ "{:,.0f}".format(total_revenue) }}</div>
+            <div class="mt-2 small text-success">
+                <i class="bi bi-arrow-up-right me-1"></i> 12% from last month
             </div>
         </div>
     </div>
-
-    <!-- Chart Section -->
-    <div class="col-md-7">
-        <div class="card border-0 shadow-sm p-3 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="fw-bold mb-0 small text-uppercase text-secondary" style="letter-spacing: 0.5px;">Revenue
-                    Trend</h6>
-                <span class="badge bg-primary-soft text-primary" style="font-size: 0.65rem;">Last 6 Months</span>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card h-100">
+            <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                <i class="bi bi-clock-history"></i>
             </div>
-            <div style="height: 120px;">
+            <div class="label">Pending Amount</div>
+            <div class="value">${{ "{:,.0f}".format(unpaid_amount) }}</div>
+            <div class="mt-2 small text-muted">
+                {{ invoice_count }} active invoices
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card h-100">
+            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="label">Total Clients</div>
+            <div class="value">{{ client_count }}</div>
+            <div class="mt-2 small text-muted">
+                Active business partners
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card h-100">
+            <div class="stat-icon bg-info bg-opacity-10 text-info">
+                <i class="bi bi-file-earmark-text-fill"></i>
+            </div>
+            <div class="label">Total Invoices</div>
+            <div class="value">{{ invoice_count }}</div>
+            <div class="mt-2 small text-muted">
+                Generated this year
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: Trend & Recent Activity -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card p-4 h-100 border-0 shadow-md">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="fw-bold mb-1">Revenue Trend</h5>
+                    <p class="text-muted small mb-0">Financial trajectory for the last 6 months</p>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary active">View All</button>
+                    <button class="btn btn-outline-secondary">Download</button>
+                </div>
+            </div>
+            <div style="height: 300px;">
                 <canvas id="earningsChart"></canvas>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Recent Invoices Table -->
-<div class="mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="fw-bold mb-0 small text-uppercase text-secondary" style="letter-spacing: 0.5px;">Recent activity</h6>
-        <a href="{{ url_for('invoices.index') }}" class="text-primary small text-decoration-none fw-bold">View All</a>
-    </div>
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive" style="max-height: 320px;">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">Invoice #</th>
-                        <th>Client</th>
-                        <th>Amount</th>
-                        <th>Due Date</th>
-                        <th>Status</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for invoice in invoices %}
-                    <tr>
-                        <td class="ps-4 fw-semibold text-primary">{{ invoice.invoice_number }}</td>
-                        <td>
-                            <div class="fw-bold">{{ invoice.client.name }}</div>
-                            <div class="text-muted small">{{ invoice.client.email }}</div>
-                        </td>
-                        <td class="fw-bold">${{ "{:,.2f}".format(invoice.amount) }}</td>
-                        <td>{{ invoice.due_date.strftime('%d %b %Y') }}</td>
-                        <td>
-                            <span
-                                class="badge rounded-pill {% if invoice.status == 'Paid' %}bg-success-soft{% elif invoice.status == 'Unpaid' %}bg-warning-soft{% else %}bg-secondary-soft{% endif %} px-3 py-2">
-                                {{ invoice.status }}
-                            </span>
-                        </td>
-                        <td class="text-end pe-4">
-                            <div class="dropdown">
-                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                    <li><a class="dropdown-item"
-                                            href="{{ url_for('invoices.download_pdf', invoice_id=invoice.id) }}"><i
-                                                class="bi bi-file-pdf me-2"></i>Download PDF</a></li>
-                                    <li><a class="dropdown-item"
-                                            href="{{ url_for('invoices.send_email', invoice_id=invoice.id) }}"><i
-                                                class="bi bi-envelope me-2"></i>Email Client</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item text-primary"
-                                            href="{{ url_for('invoices.toggle_status', invoice_id=invoice.id) }}"><i
-                                                class="bi bi-arrow-repeat me-2"></i>Toggle Status</a></li>
-                                </ul>
+    <div class="col-lg-4">
+        <div class="card h-100 border-0 shadow-md">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h5 class="fw-bold mb-1">Recent Activity</h5>
+                <p class="text-muted small">Latest invoice status updates</p>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for invoice in invoices[:5] %}
+                    <div class="list-group-item bg-transparent border-0 px-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center text-primary"
+                                style="width: 40px; height: 40px;">
+                                <i class="bi bi-file-earmark-text"></i>
                             </div>
-                        </td>
-                    </tr>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold small">{{ invoice.client.name }}</span>
+                                    <span class="small text-muted">{{ invoice.due_date.strftime('%b %d') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <span class="text-muted small">#{{ invoice.invoice_number }}</span>
+                                    <span
+                                        class="badge rounded-pill {% if invoice.status == 'Paid' %}bg-success-soft{% else %}bg-warning-soft{% endif %}">
+                                        {{ invoice.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <div class="text-muted mb-3"><i class="bi bi-inbox fs-1"></i></div>
-                            <p class="mb-0">No invoices yet. <a href="{{ url_for('invoices.create') }}"
-                                    class="text-primary fw-bold">Create your first one!</a></p>
-                        </td>
-                    </tr>
+                    <div class="text-center py-5 opacity-50">
+                        <i class="bi bi-inbox fs-2 mb-2 d-block"></i>
+                        No recent activity
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                <a href="{{ url_for('invoices.index') }}" class="btn btn-light w-100 fw-bold">View Full History</a>
+            </div>
         </div>
     </div>
 </div>
@@ -161,30 +146,30 @@
 <script>
     const ctx = document.getElementById('earningsChart').getContext('2d');
 
-    // Create gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(0, 85, 255, 0.1)');
-    gradient.addColorStop(1, 'rgba(0, 85, 255, 0)');
+    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+    gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
 
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: JSON.parse('{{ chart_labels | tojson | safe }}'),
             datasets: [{
-                label: 'Monthly Earnings',
+                label: 'Revenue',
                 data: JSON.parse('{{ chart_values | tojson | safe }}'),
-                borderColor: '#0055ff',
+                borderColor: '#4f46e5',
                 backgroundColor: gradient,
                 fill: true,
-                tension: 0.4,
-                borderWidth: 2,
-                pointRadius: 2,
+                tension: 0.45,
+                borderWidth: 3,
+                pointRadius: 4,
                 pointBackgroundColor: '#fff',
-                pointBorderWidth: 1,
-                pointHoverRadius: 4,
-                pointHoverBackgroundColor: '#0055ff',
+                pointBorderColor: '#4f46e5',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: '#4f46e5',
                 pointHoverBorderColor: '#fff',
-                pointHoverBorderWidth: 1
+                pointHoverBorderWidth: 2
             }]
         },
         options: {
@@ -194,36 +179,35 @@
                 legend: { display: false },
                 tooltip: {
                     backgroundColor: '#0f172a',
-                    padding: 8,
-                    bodyFont: { family: 'Outfit', size: 12 },
-                    titleFont: { family: 'Outfit', size: 10, weight: 'normal' },
+                    padding: 12,
+                    bodyFont: { family: 'Inter', size: 14 },
+                    titleFont: { family: 'Outfit', size: 12, weight: 'normal' },
+                    cornerRadius: 12,
                     callbacks: {
                         label: function (context) {
-                            let label = context.dataset.label || '';
-                            if (label) { label += ': '; }
-                            if (context.parsed.y !== null) {
-                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
-                            }
-                            return label;
+                            return ' ' + new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
                         }
                     }
                 }
             },
             scales: {
                 y: {
-                    display: false,
-                    beginAtZero: true
+                    grid: { color: '#f1f5f9' },
+                    ticks: {
+                        callback: function (value) { return '$' + value; },
+                        color: '#94a3b8',
+                        font: { family: 'Inter', size: 11 }
+                    },
+                    border: { display: false }
                 },
                 x: {
                     grid: { display: false },
                     ticks: {
                         color: '#94a3b8',
-                        font: { size: 10 }
-                    }
+                        font: { family: 'Inter', size: 11 }
+                    },
+                    border: { display: false }
                 }
-            },
-            layout: {
-                padding: { top: 5, bottom: 0, left: 0, right: 0 }
             }
         }
     });
