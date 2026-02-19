@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -17,112 +16,131 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <a href="{{ url_for('main.dashboard') }}" class="sidebar-brand">
-                Swift<span class="text-primary">Invoice</span>
+                Swift<span class="text-primary-gradient">Invoice</span>
             </a>
             <ul class="sidebar-nav">
                 <li class="sidebar-nav-item">
                     <a href="{{ url_for('main.dashboard') }}"
                         class="sidebar-nav-link {{ 'active' if request.path == url_for('main.dashboard') }}">
-                        <i class="bi bi-grid-fill"></i> Dashboard
+                        <i class="bi bi-grid-fill"></i> <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item">
                     <a href="{{ url_for('invoices.index') }}"
                         class="sidebar-nav-link {{ 'active' if request.path == url_for('invoices.index') }}">
-                        <i class="bi bi-receipt"></i> Invoices
+                        <i class="bi bi-receipt"></i> <span>Invoices</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item">
                     <a href="{{ url_for('clients.index') }}"
                         class="sidebar-nav-link {{ 'active' if request.path == url_for('clients.index') }}">
-                        <i class="bi bi-people-fill"></i> Clients
+                        <i class="bi bi-people-fill"></i> <span>Clients</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item">
                     <a href="{{ url_for('main.reports') }}"
                         class="sidebar-nav-link {{ 'active' if request.path == url_for('main.reports') }}">
-                        <i class="bi bi-bar-chart-fill"></i> Reports
+                        <i class="bi bi-bar-chart-fill"></i> <span>Reports</span>
                     </a>
                 </li>
 
                 <!-- Subscription Section -->
-                <li class="sidebar-nav-item mt-3 px-3">
-                    <div class="text-white small mb-2">
-                        Plan: <strong>{{ current_user.organization.plan_id|upper }}</strong>
+                <li class="sidebar-nav-item mt-4 px-3">
+                    <div class="glass-container p-3 text-center border-0" style="background: rgba(255,255,255,0.05);">
+                        <div class="text-white small mb-2 opacity-75">Current Plan</div>
+                        <div class="badge bg-primary text-white mb-2 px-3 py-2">{{
+                            current_user.organization.plan_id|upper }}</div>
+                        {% if current_user.organization.plan_id == 'free' %}
+                        <a href="{{ url_for('settings.upgrade_page') }}"
+                            class="btn btn-sm btn-warning w-100 fw-bold border-0 mt-2"
+                            style="background-color: var(--accent); color: var(--dark); font-size: 0.75rem;">
+                            Upgrade to Pro
+                        </a>
+                        {% endif %}
                     </div>
-                    {% if current_user.organization.plan_id == 'free' %}
-                    <a href="{{ url_for('settings.upgrade_page') }}" class="btn btn-sm btn-warning w-100 text-dark fw-bold"
-                        style="font-size: 0.75rem;">
-                        Upgrade to Pro
-                    </a>
-                    {% endif %}
                 </li>
 
-                <li class="sidebar-nav-item mt-4">
-                    <a href="{{ url_for('settings.settings_page') }}"
-                        class="sidebar-nav-link {{ 'active' if request.path == url_for('settings.settings_page') }}">
-                        <i class="bi bi-gear-fill"></i> Settings
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="{{ url_for('auth.logout') }}" class="sidebar-nav-link text-danger op-75">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
-                </li>
+                <div class="sidebar-footer mt-auto pt-4">
+                    <li class="sidebar-nav-item">
+                        <a href="{{ url_for('settings.settings_page') }}"
+                            class="sidebar-nav-link {{ 'active' if request.path == url_for('settings.settings_page') }}">
+                            <i class="bi bi-gear-fill"></i> <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="{{ url_for('auth.logout') }}" class="sidebar-nav-link text-danger opacity-75">
+                            <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+                        </a>
+                    </li>
+                </div>
             </ul>
         </aside>
 
-        <!-- Main Content (Authenticated) -->
+        <!-- Main Content -->
         <div class="main-container">
             <header class="top-bar">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="text-end me-2">
+                    <div class="text-end">
                         <div class="fw-bold small">{{ current_user.username }}</div>
                         <div class="text-muted" style="font-size: 0.75rem;">{{
                             current_user.organization.plan_id|capitalize }} Plan</div>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=0055ff&color=fff"
-                        class="rounded-circle" width="40" height="40">
+                    <div class="position-relative">
+                        <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=4f46e5&color=fff&bold=true"
+                            class="rounded-circle shadow-sm" width="42" height="42">
+                        <span
+                            class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle"></span>
+                    </div>
                 </div>
             </header>
             <main class="content-area">
                 {% else %}
                 <!-- Public Layout -->
-                <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-                    <div class="container">
-                        <a class="navbar-brand fw-bold fs-4" href="{{ url_for('main.index') }}">Swift<span
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top"
+                    style="background: rgba(15, 23, 42, 0.9) !important; backdrop-filter: blur(10px);">
+                    <div class="container py-2">
+                        <a class="navbar-brand fw-bold fs-3" href="{{ url_for('main.index') }}">Swift<span
                                 class="text-primary">Invoice</span></a>
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarNav">
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="navbarNav">
-                            <ul class="navbar-nav ms-auto">
-                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.index') }}">Home</a></li>
-                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.pricing') }}">Pricing</a>
-                                </li>
-                                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
-                                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">Signup</a></li>
+                            <ul class="navbar-nav ms-auto gap-2">
+                                <li class="nav-item"><a class="nav-link px-3"
+                                        href="{{ url_for('main.index') }}">Home</a></li>
+                                <li class="nav-item"><a class="nav-link px-3"
+                                        href="{{ url_for('main.pricing') }}">Pricing</a></li>
+                                <li class="nav-item ms-lg-3"><a class="btn btn-outline-light px-4"
+                                        href="{{ url_for('auth.login') }}">Login</a></li>
+                                <li class="nav-item"><a class="btn btn-primary px-4"
+                                        href="{{ url_for('auth.signup') }}">Get Started</a></li>
                             </ul>
                         </div>
                     </div>
                 </nav>
-                <div class="container">
+                <div>
                     {% endif %}
 
-                    <!-- Unified Flash Messages & Content Block -->
-                    {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-info alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <!-- Flash Messages -->
+                    <div class="container-fluid px-0">
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert glass-container border-0 shadow-sm alert-info alert-dismissible fade show mb-4"
+                            role="alert">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle-fill text-primary"></i>
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                        {% block content %}{% endblock %}
                     </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-
-                    {% block content %}{% endblock %}
 
                     {% if current_user.is_authenticated %}
             </main>

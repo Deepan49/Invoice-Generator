@@ -17,12 +17,12 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _db_url or \
         'sqlite:///' + os.path.join(basedir, '../database.db')
         
-    # Connection Pooling for Production
+    # Connection Pooling - Only for non-SQLite databases
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_size': 10,
         'pool_recycle': 3600,
         'pool_pre_ping': True,
-    }
+    } if not (_db_url and _db_url.startswith('sqlite')) and not (not _db_url) else {}
     
     # Celery
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL') or 'redis://localhost:6379/0'
@@ -63,6 +63,7 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite://'
+    SQLALCHEMY_ENGINE_OPTIONS = {}
     WTF_CSRF_ENABLED = False
     CELERY_ALWAYS_EAGER = True
 

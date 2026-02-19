@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-wrapper d-flex">
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar bg-dark text-white p-3" style="width: 250px; min-height: 100vh;">
+        <h4 class="mb-4">Admin Panel</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin.dashboard') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin.dashboard' }}">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin_users.index') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin_users.index' }}">
+                    <i class="bi bi-people me-2"></i> Users
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin_orgs.index') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin_orgs.index' }}">
+                    <i class="bi bi-building me-2"></i> Organizations
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin_invoices.index') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin_invoices.index' }}">
+                    <i class="bi bi-receipt me-2"></i> Invoices
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin_subscriptions.index') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin_subscriptions.index' }}">
+                    <i class="bi bi-credit-card me-2"></i> Subscriptions
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin_logs.index') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin_logs.index' }}">
+                    <i class="bi bi-journal-text me-2"></i> Audit Logs
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="{{ url_for('admin_settings.index') }}"
+                    class="nav-link text-white {{ 'active fw-bold' if request.endpoint == 'admin_settings.index' }}">
+                    <i class="bi bi-gear me-2"></i> Settings
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a href="{{ url_for('main.dashboard') }}" class="nav-link text-info">
+                    <i class="bi bi-arrow-left me-2"></i> Back to App
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Admin Main Content -->
+    <div class="admin-content flex-grow-1 p-4 bg-light">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+
+<style>
+    .admin-sidebar .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+    }
+
+    .op-50 {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}

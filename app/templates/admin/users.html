@@ -1,51 +1,85 @@
-{% extends "admin/base.html" %}
+{% extends "admin/base_admin.html" %}
 
-{% block title %}Manage Users - Admin{% endblock %}
-
-{% block content %}
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900">Manage Users</h1>
-        <a href="{{ url_for('admin.dashboard') }}" class="text-gray-500 hover:text-gray-700">Back to Dashboard</a>
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>User Management</h2>
+        <div class="d-flex gap-2">
+            <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+            <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+        </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-600">
-                <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-medium">
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
                     <tr>
-                        <th class="px-6 py-3">ID</th>
-                        <th class="px-6 py-3">Username</th>
-                        <th class="px-6 py-3">Email</th>
-                        <th class="px-6 py-3">Organization</th>
-                        <th class="px-6 py-3">Role</th>
-                        <th class="px-6 py-3 text-right">Actions</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Organization</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody>
                     {% for user in users %}
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 font-medium text-gray-900">#{{ user.id }}</td>
-                        <td class="px-6 py-4">{{ user.username }}</td>
-                        <td class="px-6 py-4">{{ user.email }}</td>
-                        <td class="px-6 py-4">{{ user.organization.name if user.organization else '-' }}</td>
-                        <td class="px-6 py-4">
-                            {% if user.is_admin %}
-                            <span
-                                class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Admin</span>
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random"
+                                    class="rounded-circle me-3" width="32">
+                                <div>
+                                    <div class="fw-bold">{{ user.username }}</div>
+                                    <div class="text-muted small">{{ user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'info' if user.role == 'super_admin' else 'secondary' }}">
+                                {{ user.role | upper }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ user.organization.name if user.organization else 'N/A' }}
+                        </td>
+                        <td>
+                            {% if user.is_suspended %}
+                            <span class="badge bg-danger">Suspended</span>
                             {% else %}
-                            <span
-                                class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">User</span>
+                            <span class="badge bg-success">Active</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            {% if not user.is_admin %}
-                            <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST" class="inline"
-                                onsubmit="return confirm('Delete {{ user.username }}? All their data will be lost forever.');">
-                                <button type="submit"
-                                    class="text-red-500 hover:text-red-700 font-medium ml-4">Delete</button>
-                            </form>
-                            {% endif %}
+                        <td class="small">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+                        <td class="text-end">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light border" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#">View Activity</a></li>
+                                    <li><a class="dropdown-item" href="#">Change Role</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    {% if user.is_suspended %}
+                                    <li>
+                                        <form action="{{ url_for('admin_users.activate', user_id=user.id) }}"
+                                            method="POST">
+                                            <button type="submit" class="dropdown-item text-success">Activate</button>
+                                        </form>
+                                    </li>
+                                    {% else %}
+                                    <li>
+                                        <form action="{{ url_for('admin_users.suspend', user_id=user.id) }}"
+                                            method="POST">
+                                            <button type="submit" class="dropdown-item text-danger">Suspend</button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

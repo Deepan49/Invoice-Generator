@@ -1,0 +1,91 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Subscription Management</h2>
+    </div>
+
+    <div class="row g-4 mb-5">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ plan.name }}</h5>
+                    <div class="h3 fw-bold mb-3">${{ plan.price }}/mo</div>
+                    <ul class="list-unstyled small text-muted">
+                        <li>{{ plan.features }}</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <button class="btn btn-sm btn-outline-primary w-100">Edit Plan</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">Assign Subscription Plan</h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('admin_subscriptions.assign_plan') }}" method="POST" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Select Organization</label>
+                    <select name="org_id" class="form-select" required>
+                        {% for org in all_orgs %}
+                        <option value="{{ org.id }}">{{ org.name }} (Current: {{ org.plan_id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">New Plan</label>
+                    <select name="plan_name" class="form-select" required>
+                        <option value="free">Free</option>
+                        <option value="pro">Pro</option>
+                        <option value="enterprise">Enterprise</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Update Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">Organizational Billing Tiers</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Organization</th>
+                        <th>Current Tier</th>
+                        <th>Member Count</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for org in all_orgs %}
+                    <tr>
+                        <td class="fw-bold">{{ org.name }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'warning text-dark' if org.plan_id != 'free' else 'secondary' }}">
+                                {{ org.plan_id | upper }}
+                            </span>
+                        </td>
+                        <td>{{ org.users | length }}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-light border">Invoice History</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
